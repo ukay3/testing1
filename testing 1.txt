@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive Physics Tool</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f0f4f8; }
+        canvas { background: white; border: 2px solid #333; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .controls { margin: 20px; padding: 15px; background: white; border-radius: 8px; display: flex; gap: 20px; }
+    </style>
+</head>
+<body>
+
+    <h2>Projectile Motion Simulator</h2>
+
+    <div class="controls">
+        <label>Initial Velocity: <input type="range" id="vel" min="10" max="100" value="50"> <span id="vVal">50</span></label>
+        <label>Angle: <input type="range" id="ang" min="0" max="90" value="45"> <span id="aVal">45</span>°</label>
+        <button onclick="launch()">Launch</button>
+    </div>
+
+    <canvas id="simCanvas" width="800" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        let animation;
+
+        function launch() {
+            cancelAnimationFrame(animation);
+            let v0 = document.getElementById('vel').value;
+            let angle = document.getElementById('ang').value * Math.PI / 180;
+            let x = 0, y = 0, t = 0;
+            const g = 9.81;
+
+            function draw() {
+                // Physics Calculations
+                x = v0 * Math.cos(angle) * t;
+                y = (v0 * Math.sin(angle) * t) - (0.5 * g * t * t);
+
+                // Clear and Draw
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.beginPath();
+                // Map physics coordinates to canvas (invert Y because canvas 0 is top)
+                ctx.arc(x, 400 - y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = "#2c3e50";
+                ctx.fill();
+
+                t += 0.1;
+                if (y >= 0 && x <= 800) {
+                    animation = requestAnimationFrame(draw);
+                }
+            }
+            draw();
+        }
+
+        // Update UI labels
+        document.getElementById('vel').oninput = e => document.getElementById('vVal').innerText = e.target.value;
+        document.getElementById('ang').oninput = e => document.getElementById('aVal').innerText = e.target.value;
+    </script>
+</body>
+</html>
